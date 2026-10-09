@@ -13,16 +13,14 @@ const txtNombre = document.getElementById("txtVehiculo");
 const txtApellido = document.getElementById("txtFecha");
 const txtTelefeno = document.getElementById("txtPasajeros");
 const txtDias = document.getElementById("txtDias");
-const txtPagar = document.getElementById("txtPagar");
-const txtestadoActual = document.getElementById("txtestadoActual");
+const txtPagar = document.getAnimations("txtPagar");
 const btnCancelar = document.getElementById("btnCancelar");
-const btnAgregarReservas = document.getElementById("btnAgregarReservas");
-const tbReservas = document.getElementById("tbReservas");
-
-async function cargarReservas() {
+const btnAgregarCliente = document.getElementById("btnAgregarCliente");
+const tbIndex = document.getElementById("tbIndex");
+async function cargarClientes() {
   try {
     const posts = await
-                obtenerReservas();
+                obtenerClientes();
     // Actualizar el DOM con los posts
     mostrarEnPagina(posts);
   } catch
@@ -42,21 +40,15 @@ function mostrarEnPagina(posts)
   });
 } 
 
-function renderTabla(reservar){
-    tbReservas.innerHTML = "";
-    reservar.forEach((reservar) => {
+function renderTabla(clientes){
+    tbIndex.innerHTML = "";
+    clientes.forEach((clientes) => {
         const fila = document.createElement("tr");
         fila.innerHTML = `
         <td> ${txtEmail.id}</td>
-        <td> ${txtCompleto.id}</td>
-        <td> ${txtVehiculo.id}</td>
-        <td> ${txtFecha.id}</td>
-        <td> ${txtPasajeros.id}</td>
-        <td> ${txtDias.id}</td>
-        <td> ${txtPagar.id}</td>
-        <td> ${txtestadoActual.id}</td>
-        <td> ${btnCancelar.id}</td>
-        <td> ${btnAgregarReservas.id}</td>
+        <td> ${txtNombre.id}</td>
+        <td> ${txtApellido.id}</td>
+        <td> ${txtTelefeno.id}</td>
         <td>
         <button class = "btn btn-sm btn-warning" id="btnEditar" > Editar </button>
         <button class = "btn btn-sm btn-danger" id="btnEliminar" > Eliminar </button>
@@ -75,13 +67,9 @@ from.addEventListener("submit", async (e) => {
     e.preventDefault();
     const nombre = {
         email: emailInput.value,
-        txtCompleto: txtCompletoInput.value,
-        txtVehiculo: txtVehiculoInput.value,
-        txtFecha: txtFechaInput.value,
-        txtPasajeros: txtPasajeros.value,
-        txtDias: txtDiasInput.value,
-        txtPagar: txtPagarInput.value,
-        txtestadoActual: txtestadoActual.value,
+        nombre: nombreInput.value,
+        apellido: nombreInput.value,
+        telefono: nombreInput.value,
     };
 });
 
@@ -92,15 +80,14 @@ renderTabla.addEventListener("click", async (e) => {
     if(!id) return;
 
     if(id.target.classList.contains("btnEditar")){
-        const email = await obtenerReservas();
+        const email = await obtenerClientes();
         const reservar = reservar.find((r) => String (r.id) === String(rd));
 
         if(id.target.classList. contains("btnEditar")){
-            txtCompleto.value = reservar.txtCompleto;
-            txtVehiculo.value = reservar.txtVehiculo;
-            apellidoInput.value = reservar.txtApellido;
-            telefonoInput.value = reservar.txtTelefeno;
-            txtDias.value = renderTabla
+            idInput.value = reservar.id;
+            nombreInput.value = reservar.nombre;
+            apellidoInput.value = reservar.apellido;
+            telefonoInput.value = reservar.telefono;
         }
     }
 })
