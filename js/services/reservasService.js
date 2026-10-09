@@ -1,12 +1,12 @@
 //Import del url
 //FALTA
-const API_URL = "";
+const API_URL = "localhost8080:/api/reservas";
 
 
 //GET
 async function obtenerReservas() {
     // Paso 1: esperar la respuesta del servidor
-    const response = await fetch('https://api.ejemplo.com/usuarios');
+    const response = await fetch('localhost8080:/api/reservas');
   
     // Verificar que no hubo error HTTP (404, 500, etc.)
     if (!response.ok) {
@@ -25,7 +25,7 @@ async function obtenerReservas() {
 
   //POST
   async function crearReservas(Completo, Vehiculo, Fecha, Pasajeros, Dias, Pagar, estadoActual) {
-    const response = await fetch('https://api.ejemplo.com/usuarios', {
+    const response = await fetch('localhost8080:/api/reservas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'  // le decimos al servidor que enviamos JSON
@@ -47,7 +47,7 @@ async function obtenerReservas() {
 
   //PUT
   async function actualizarReservas(id) {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    const response = await fetch(`localhost8080:/api/reservas/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -72,7 +72,7 @@ async function obtenerReservas() {
 
   //DELETE
   async function eliminarReservas(id) {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    const response = await fetch(`localhost8080:/api/reservas/${id}`, {
       method: 'DELETE'
       // DELETE no lleva headers ni body
     });

@@ -1,32 +1,20 @@
 //Import del url
 //FALTA
-const API_URL = "";
+const API_URL = "localhost:8080/api/clientes";
 
 
 
 //GET
-async function obtenerClientes() {
-    // Paso 1: esperar la respuesta del servidor
-    const response = await fetch('https://api.ejemplo.com/usuarios');
-  
-    // Verificar que no hubo error HTTP (404, 500, etc.)
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-  
-    // Paso 2: convertir el JSON en un objeto de JavaScript
-    const clientes = await response.json();
-  
-    console.log(clientes); // arreglo de objetos
-    return clientes;
-  }
-  
-  obtenerClientes();
+export const crearPost      = (data)        => req(BASE, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(data)
+});
 
 
   //POST
-  async function crearCliente(email, nombre, apellido, telefono) {
-    const response = await fetch('https://api.ejemplo.com/usuarios', {
+  async function crearCliente() {
+    const response = await fetch('localhost:8080/api/clientes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'  // le decimos al servidor que enviamos JSON
@@ -42,38 +30,18 @@ async function obtenerClientes() {
     console.log('Creado con ID:', nuevoCliente.id);
     return nuevoCliente;
   }
-  
-  crearCliente();
 
-
-  //PUT
-  async function actualizarCliente(id) {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: id,
-        title: 'Título completamente nuevo',
-        body: 'Contenido completamente nuevo',
-        userId: 1
-      })
-    });
-  
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-  
-    const clienteActualizado = await response.json();
-    console.log(clienteActualizado);
-    return clienteActualizado;
-  }
-  
-  actualizarCliente();
+// UPDATE — PUT (reemplazo completo)
+export const actualizarCliente = (id, data)    => req(`${BASE}/${id}`, {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(data)
+});
 
 
   //DELETE
   async function eliminarCliente(id) {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    const response = await fetch(`localhost:8080/api/clientes/${id}`, {
       method: 'DELETE'
       // DELETE no lleva headers ni body
     });
