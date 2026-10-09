@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Boostrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <title>Index pagina</title>
+    <title>Reservas pagina</title>
 </head>
 <body>
     <!-- Navbar -->
@@ -18,94 +18,125 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="clientes.html">Clientes</a>
+                <a class="nav-link active" aria-current="page" href="index.html">Reservas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="clientes.html">Clientes</a>
               </li>
             </ul>
           </div>
         </div>
       </nav>
       <br>
+      <!-- Fin navbar -->
 
-      <!-- Boton de añadir clientes -->
-      <button type="button" class="btn btn-primary text-center" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Gestion de Clientes</button>
-      <br>
-      
-      <!-- Parte superior del modall -->
-       <!-- id -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-                <!-- id -->
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Agrega clientes</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <!-- Campos del modal  -->
+      <!-- Alertas de la pagina -->
+      <div id="alertas" class="container"></div>
 
-                <!-- Campo: Email -->
+       <!-- Boton de añadir reservas -->
+       <button id="btnNuevo" type="button" class="btn btn-primary text-center" data-bs-toggle="modal" data-bs-target="#exampleModal">Gestion de reservas</button>
+       <br>
+
+       <!-- Parte superior del modall -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h1 class="modal-title fs-5" id="exampleModalLabel">Agrega reservas</h1>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <!-- Alertas del modal -->
+               <div id="alertaModal"></div>
+               <form id="formReserva" novalidate>
+                 <!-- Campos del modal  -->
+
+                  <!-- Campo: Nombre completo -->
                 <div class="mb-3">
-                    <!-- id: txtEmail -->
-                  <label for="txtEmail" class="col-form-label">Email:</label>
-                  <input type="email" class="form-control" id="txtEmail" placeholder="Ingrese su correo electronico: " required>
+                  <label for="txtCompleto" class="col-form-label">Nombre completo del cliente:</label>
+                  <select id="txtCompleto" name="txtCompleto" class="form-select" required></select>
                 </div>
 
-                <!-- Campo: Nombre -->
+                <!-- Campo: Vehiculo -->
                 <div class="mb-3">
-                    <!-- id: txtNombre -->
-                  <label for="txtNombre" class="col-form-label">Nombre:</label>
-                  <input type="text" class="form-control" id="txtNombre" placeholder="Ingrese su nombre: " required>
+                  <label for="txtVehiculo" class="col-form-label">Vehiulo seleccionado:</label>
+                  <select id="txtVehiculo" name="txtVehiculo" class="form-select" required></select>
                 </div>
 
-                <!-- Campo: Apellido -->
+                <!-- Campo: Nombre de la reserva -->
                 <div class="mb-3">
-                    <!-- id: txtApellido -->
-                  <label for="txtApellido" class="col-form-label">Apelldio:</label>
-                  <input type="text" class="form-control" id="txtApellido" placeholder="Ingrese su Apelldio: " required>
+                  <label for="txtNombreReserva" class="col-form-label">Nombre de la reserva:</label>
+                  <input type="text" class="form-control" id="txtNombreReserva" maxlength="100" placeholder="Ingrese el nombre de la reserva: " required>
                 </div>
 
-                <!-- Campo: Telefono -->
+                <!-- Campo: fecha de reserva -->
                 <div class="mb-3">
-                    <!-- id: txtTelefeno -->
-                  <label for="txtTelefeno" class="col-form-label">Telefono:</label>
-                  <input type="number" class="form-control" id="txtTelefeno" placeholder="Ingrese su Telefono: " required>
+                  <label for="txtFecha" class="col-form-label">Fecha:</label>
+                  <input type="date" class="form-control" id="txtFecha" placeholder="Ingrese su fecha: " required>
                 </div>
-              </form>
-            </div>
 
+                <!-- Campo: Cantidad de pasajeros -->
+                <div class="mb-3">
+                  <label for="txtPasajeros" class="col-form-label">Pasajeros:</label>
+                  <input type="number" class="form-control" id="txtPasajeros" min="1" step="1" placeholder="Ingrese la cantidad de pasajeros: " required>
+                </div>
 
-            
+                <!-- Campo: Cantidad de dias -->
+                <div class="mb-3">
+                  <label for="txtDias" class="col-form-label">Cantidad de dias:</label>
+                  <input type="number" class="form-control" id="txtDias" min="1" step="1" placeholder="Ingrese la cantidad de dias: " required>
+                </div>
 
-            <div class="modal-footer">
-              <button id="btnCancelar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <!-- id:  -->
-              <button id="btnAgregarCliente" type="button" class="btn btn-primary">Agregar cliente</button>
-            </div>
-          </div>
-        </div>
-      </div>
+                <!-- Campo: Total a pagar (lo calcula el backend) -->
+                <div class="mb-3">
+                  <label for="txtPagar" class="col-form-label">Total a pagar:</label>
+                  <input type="text" class="form-control" id="txtPagar" placeholder="Se calcula automaticamente" readonly>
+                </div>
 
-      <!-- Tabla de html -->
-       <main class=".col-md-4">
-      <table class="table">
-        <thead class="text-center">
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Email</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Apellido</th>
-            <th scope="col">Telefono</th>
-          </tr>
-        </thead>
-        <tbody id="tbIndex">
-          <!-- Aqui se inserta los datos de js -->
-        </tbody>
-      </table>
-    </main>
+                <!-- Campo: Estado actual -->
+                <div class="mb-3">
+                  <label for="txtestadoActual" class="col-form-label">Estado actual:</label>
+                  <select id="txtestadoActual" name="txtestadoActual" class="form-select">
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="CONFIRMADA">Confirmada</option>
+                    <option value="CANCELADA">Cancelada</option>
+                    <option value="FINALIZADA">Finalizada</option>
+                  </select>
+                </div>
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button id="btnCancelar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+               <button id="btnAgregarReservas" type="button" class="btn btn-primary">Agregar reservas</button>
+             </div>
+           </div>
+         </div>
+       </div>
 
-    <!-- Boostrap js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script type="module" src="./js/controllers/indexController.js"></script>
+       <!-- Tabla de html -->
+        <main class=".col-md-4">
+       <table class="table">
+         <thead class="text-center">
+           <tr>
+             <th scope="col">#</th>
+             <th scope="col">Nombre completo del cliente</th>
+             <th scope="col">Vehiculo seleccionado</th>
+             <th scope="col">Fecha reserva</th>
+             <th scope="col">Cantidad de pasajeros</th>
+             <th scope="col">Cantidad de dìas</th>
+             <th scope="col">Total a pagar</th>
+             <th scope="col">Estado actual</th>
+             <th scope="col">Acciones</th>
+           </tr>
+         </thead>
+         <tbody id="tbReservas" class="text-center">
+           <!-- Aqui se inserta los datos de js -->
+         </tbody>
+       </table>
+     </main>
+
+   <!-- Boostrap js -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+   <script type="module" src="./js/controllers/indexController.js"></script>
 </body>
 </html>

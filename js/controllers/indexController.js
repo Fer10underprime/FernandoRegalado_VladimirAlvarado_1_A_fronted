@@ -1,129 +1,164 @@
-// js/controllers/api-controller.js
+// Controller de Reservas (index.html): maneja el DOM y consume los Services
+import { obtenerReservas, crearReserva, actualizarReserva, eliminarReserva } from "../services/reservasService.js";
+import { obtenerClientes } from "../services/clientesService.js";
+import { obtenerVehiculo } from "../services/vehiculoService.js";
+import { mostrarAlerta, limpiarAlerta, escapeHtml } from "./ui.js";
 
-// Importar el Service
-import { obtenerClientes, actualizarCliente, eliminarCliente } from '../services/clientesService.js';
-
-const from = document.getElementById("txtEmail");
 const exampleModal = document.getElementById("exampleModal");
 const exampleModalLabel = document.getElementById("exampleModalLabel");
-const txtEmail = document.getElementById("txtEmail");
-const txtNombre = document.getElementById("txtNombre");
-const txtApellido = document.getElementById("txtApellido");
-const txtTelefeno = document.getElementById("txtTelefeno");
-const btnCancelar = document.getElementById("btnCancelar");
+const formReserva = document.getElementById("formReserva");
+const txtCompleto = document.getElementById("txtCompleto");
+const txtVehiculo = document.getElementById("txtVehiculo");
+const txtNombreReserva = document.getElementById("txtNombreReserva");
+const txtFecha = document.getElementById("txtFecha");
+const txtPasajeros = document.getElementById("txtPasajeros");
 const txtDias = document.getElementById("txtDias");
+const txtPagar = document.getElementById("txtPagar");
+const txtestadoActual = document.getElementById("txtestadoActual");
+const btnNuevo = document.getElementById("btnNuevo");
+const btnAgregarReservas = document.getElementById("btnAgregarReservas");
+const tbReservas = document.getElementById("tbReservas");
 
-const btnAgregarCliente = document.getElementById("btnAgregarCliente");
-const tbIndex = document.getElementById("tbIndex");
+const modal = bootstrap.Modal.getOrCreateInstance(exampleModal);
+let reservas = [];
+let idEditando = null;
 
-async function cargarClientes() {
+// Llena los <select> de cliente y vehículo desde la API
+async function cargarSelects() {
   try {
-    const posts = await
-                obtenerClientes();
-    // Actualizar el DOM con los posts
-    mostrarEnPagina(posts);
-  } catch
-                (error) {
-    mostrarError(error.message);
+    const [resClientes, resVehiculos] = await Promise.all([obtenerClientes(), obtenerVehiculo()]);
+
+    txtCompleto.innerHTML = '<option value="">Seleccione un cliente</option>' +
+      resClientes.data.map((c) =>
+        `<option value="${c.idCliente}">${escapeHtml(c.nombre + " " + c.apellido)}</option>`).join("");
+
+    txtVehiculo.innerHTML = '<option value="">Seleccione un vehículo</option>' +
+      resVehiculos.data.map((v) =>
+        `<option value="${v.idVehiculo}">${escapeHtml(`${v.marca} ${v.modelo} (${v.placa}) - cap. ${v.capacidad} - $${Number(v.precioDia).toFixed(2)}/día`)}</option>`).join("");
+  } catch (error) {
+    mostrarAlerta("alertas", error.message, "danger");
   }
 }
 
-function mostrarEnPagina(posts)
-                {
-  const lista = document.getElementById('postsList');
-  posts.forEach(post => {
-    const div =
-                document.createElement('div');
-    div.textContent = post.title;
-    lista.appendChild(div);
+async function cargarReservas() {
+  try {
+    const respuesta = await obtenerReservas();
+    reservas = respuesta.data;
+    renderTabla(reservas);
+  } catch (error) {
+    mostrarAlerta("alertas", error.message, "danger");
+  }
+}
+
+function renderTabla(lista) {
+  tbReservas.innerHTML = "";
+  lista.forEach((r) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${r.idReserva}</td>
+      <td>${escapeHtml(r.nombreCliente)}</td>
+      <td>${escapeHtml(r.vehiculo)}</td>
+      <td>${escapeHtml(r.fechaReserva)}</td>
+      <td>${r.cantidadPasajeros}</td>
+      <td>${r.cantidadDias}</td>
+      <td>$${Number(r.totalPago).toFixed(2)}</td>
+      <td>${escapeHtml(r.estado)}</td>
+      <td>
+        <button class="btn btn-sm btn-warning btn-editar" data-id="${r.idReserva}">Editar</button>
+        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${r.idReserva}">Eliminar</button>
+      </td>`;
+    tbReservas.appendChild(fila);
   });
-} 
-
-function renderTabla(clientes){
-    tbIndex.innerHTML = "";
-    clientes.forEach((clientes) => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-        <td> ${txtEmail.id}</td>
-        <td> ${txtCompleto.id}</td>
-        <td> ${txtVehiculo.id}</td>
-        <td> ${txtFecha.id}</td>
-        <td> ${txtPasajeros.id}</td>
-        <td> ${txtDias.id}</td>
-        <td> ${txtPagar.id}</td>
-        <td> ${txtestadoActual.id}</td>
-        <td> ${btnCancelar.id}</td>
-        <td> ${btnAgregarReservas.id}</td>
-        <td>
-        <button class = "btn btn-sm btn-warning" id="btnEditar" > Editar </button>
-        <button class = "btn btn-sm btn-danger" id="btnEliminar" > Eliminar </button>
-        </td>
-        `;
-        tbIndex.appendChild(fila)
-    });
 }
 
-function limpiarFormulario(){
-    from.reset();
-    idInput.value = "";
+function limpiarFormulario() {
+  formReserva.reset();
+  idEditando = null;
+  txtPagar.value = "";
+  // Al crear, la API siempre la deja CONFIRMADA
+  txtestadoActual.value = "CONFIRMADA";
+  txtestadoActual.disabled = true;
+  exampleModalLabel.textContent = "Agrega reservas";
+  btnAgregarReservas.textContent = "Agregar reservas";
+  limpiarAlerta("alertaModal");
 }
 
-from.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const nombre = {
-        email: emailInput.value,
-        txtCompleto: txtCompletoInput.value,
-        txtVehiculo: txtVehiculoInput.value,
-        txtFecha: txtFechaInput.value,
-        txtPasajeros: txtPasajeros.value,
-        txtDias: txtDiasInput.value,
-        txtPagar: txtPagarInput.value,
-        txtestadoActual: txtestadoActual.value
-    };
+async function guardar() {
+  if (!formReserva.reportValidity()) return;
+
+  const reserva = {
+    idCliente: Number(txtCompleto.value),
+    idVehiculo: Number(txtVehiculo.value),
+    nombreReserva: txtNombreReserva.value.trim(),
+    fechaReserva: txtFecha.value,
+    cantidadPasajeros: Number(txtPasajeros.value),
+    cantidadDias: Number(txtDias.value)
+  };
+  if (!reserva.nombreReserva) {
+    mostrarAlerta("alertaModal", "El nombre de la reserva es obligatorio", "warning");
+    return;
+  }
+  if (reserva.cantidadPasajeros < 1 || reserva.cantidadDias < 1) {
+    mostrarAlerta("alertaModal", "Pasajeros y días deben ser al menos 1", "warning");
+    return;
+  }
+
+  try {
+    let respuesta;
+    if (idEditando) {
+      reserva.estado = txtestadoActual.value;
+      respuesta = await actualizarReserva(idEditando, reserva);
+    } else {
+      respuesta = await crearReserva(reserva);
+    }
+    modal.hide();
+    mostrarAlerta("alertas", respuesta.message, "success");
+    await cargarReservas();
+  } catch (error) {
+    mostrarAlerta("alertaModal", error.message, "danger");
+  }
+}
+
+function editar(id) {
+  const r = reservas.find((x) => String(x.idReserva) === String(id));
+  if (!r) return;
+  limpiarFormulario();
+  idEditando = r.idReserva;
+  txtCompleto.value = r.idCliente;
+  txtVehiculo.value = r.idVehiculo;
+  txtNombreReserva.value = r.nombreReserva;
+  txtFecha.value = r.fechaReserva;
+  txtPasajeros.value = r.cantidadPasajeros;
+  txtDias.value = r.cantidadDias;
+  txtPagar.value = Number(r.totalPago).toFixed(2);
+  txtestadoActual.disabled = false;
+  txtestadoActual.value = r.estado;
+  exampleModalLabel.textContent = "Editar reserva";
+  btnAgregarReservas.textContent = "Guardar cambios";
+  modal.show();
+}
+
+async function eliminar(id) {
+  if (!confirm("¿Eliminar esta reserva?")) return;
+  try {
+    const respuesta = await eliminarReserva(id);
+    mostrarAlerta("alertas", respuesta.message, "success");
+    await cargarReservas();
+  } catch (error) {
+    mostrarAlerta("alertas", error.message, "danger");
+  }
+}
+
+btnNuevo.addEventListener("click", limpiarFormulario);
+btnAgregarReservas.addEventListener("click", guardar);
+
+tbReservas.addEventListener("click", (e) => {
+  const boton = e.target.closest("button");
+  if (!boton) return;
+  if (boton.classList.contains("btn-editar")) editar(boton.dataset.id);
+  if (boton.classList.contains("btn-eliminar")) eliminar(boton.dataset.id);
 });
 
-btnCancelar.addEventListener("click", limpiarFormulario);
-
-renderTabla.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-    if(!id) return;
-
-    if(id.target.classList.contains("btnEditar")){
-        const email = await obtenerReservas();
-        const clientes = clientes.find((r) => String (r.id) === String(rd));
-
-        if(id.target.classList. contains("btnEditar")){
-            txtCompleto.value = reservar.txtCompleto;
-            txtVehiculo.value = reservar.txtVehiculo;
-            txtApellidoapellidoInput.value = reservar.txtApellido;
-            txttelefonoInput.value = reservar.txtTelefeno;
-            txtDias.value = reservar.txtDias;
-            txtPagar.value = reservar.txtPagar;
-        }
-    }
-})
-
-if(e.target.classList.contains("btnEliminar")){
-    if(!confirm ("Eliminar esta reserva"))
-    try{
-        await eliminarCliente();
-        await cargarClientes();
-    } catch (error){
-        console.error(error);
-        alert("No se puede eliminar la reserva");
-    }
-};
-
-cargarClientes();
-
-async function guardarCambios(email, nombre, apellido, telefono) {
-    const postActualzado = await guardarCambios(email, nombre, apellido, telefono);
-    console.log('Guardado: ', postActualzado);
-}
-
-async function eliminarCliente() {
-    await eliminarCliente();
-    console.log(`Post ${id} eliminado de la API.`);
-}
-
-cargarClientes();
+limpiarFormulario();
+cargarSelects();
+cargarReservas();

@@ -1,118 +1,132 @@
-// js/controllers/api-controller.js
+// Controller de Clientes: maneja el DOM y consume clientesService
+import { obtenerClientes, crearCliente, actualizarCliente, eliminarCliente } from "../services/clientesService.js";
+import { mostrarAlerta, limpiarAlerta, escapeHtml } from "./ui.js";
 
-// Importar el Service
-import { obtenerClientes, crearCliente, actualizarCliente, eliminarCliente } from './indexController.js';
-import { obtenerVehiculo, obtenerVehiculoId} from '../services/vehiculoService.js';
-
-
-const from = document.getElementById("txtEmail");
 const exampleModal = document.getElementById("exampleModal");
 const exampleModalLabel = document.getElementById("exampleModalLabel");
-const txtEmail = document.getElementById("txtCompleto");
-const txtNombre = document.getElementById("txtVehiculo");
-const txtApellido = document.getElementById("txtFecha");
-const txtTelefeno = document.getElementById("txtPasajeros");
-const txtDias = document.getElementById("txtDias");
-const txtPagar = document.getAnimations("txtPagar");
-const btnCancelar = document.getElementById("btnCancelar");
+const formCliente = document.getElementById("formCliente");
+const txtEmail = document.getElementById("txtEmail");
+const txtNombre = document.getElementById("txtNombre");
+const txtApellido = document.getElementById("txtApellido");
+const txtTelefeno = document.getElementById("txtTelefeno");
+const txtDireccion = document.getElementById("txtDireccion");
+const btnNuevo = document.getElementById("btnNuevo");
 const btnAgregarCliente = document.getElementById("btnAgregarCliente");
 const tbIndex = document.getElementById("tbIndex");
+
+const modal = bootstrap.Modal.getOrCreateInstance(exampleModal);
+let clientes = [];
+let idEditando = null;
+
 async function cargarClientes() {
   try {
-    const posts = await
-                obtenerClientes();
-    // Actualizar el DOM con los posts
-    mostrarEnPagina(posts);
-  } catch
-                (error) {
-    mostrarError(error.message);
+    const respuesta = await obtenerClientes();
+    clientes = respuesta.data;
+    renderTabla(clientes);
+  } catch (error) {
+    mostrarAlerta("alertas", error.message, "danger");
   }
 }
 
-function mostrarEnPagina(posts)
-                {
-  const lista = document.getElementById('postsList');
-  posts.forEach(post => {
-    const div =
-                document.createElement('div');
-    div.textContent = post.title;
-    lista.appendChild(div);
+function renderTabla(lista) {
+  tbIndex.innerHTML = "";
+  lista.forEach((c) => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${c.idCliente}</td>
+      <td>${escapeHtml(c.email)}</td>
+      <td>${escapeHtml(c.nombre)}</td>
+      <td>${escapeHtml(c.apellido)}</td>
+      <td>${escapeHtml(c.telefono)}</td>
+      <td>${escapeHtml(c.direccion)}</td>
+      <td>
+        <button class="btn btn-sm btn-warning btn-editar" data-id="${c.idCliente}">Editar</button>
+        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${c.idCliente}">Eliminar</button>
+      </td>`;
+    tbIndex.appendChild(fila);
   });
-} 
-
-function renderTabla(clientes){
-    tbIndex.innerHTML = "";
-    clientes.forEach((clientes) => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-        <td> ${txtEmail.id}</td>
-        <td> ${txtNombre.id}</td>
-        <td> ${txtApellido.id}</td>
-        <td> ${txtTelefeno.id}</td>
-        <td>
-        <button class = "btn btn-sm btn-warning" id="btnEditar" > Editar </button>
-        <button class = "btn btn-sm btn-danger" id="btnEliminar" > Eliminar </button>
-        </td>
-        `;
-        tbIndex.appendChild(fila)
-    });
 }
 
-function limpiarFormulario(){
-    from.reset();
-    idInput.value = "";
+function limpiarFormulario() {
+  formCliente.reset();
+  idEditando = null;
+  exampleModalLabel.textContent = "Agrega clientes";
+  btnAgregarCliente.textContent = "Agregar cliente";
+  limpiarAlerta("alertaModal");
 }
 
-from.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const nombre = {
-        email: emailInput.value,
-        nombre: nombreInput.value,
-        apellido: nombreInput.value,
-        telefono: nombreInput.value,
-    };
+// Validaciones antes de enviar; devuelve el mensaje de error o null
+function validar(cliente) {
+  if (!cliente.email || !cliente.nombre || !cliente.apellido || !cliente.telefono) {
+    return "Email, nombre, apellido y teléfono son obligatorios";
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cliente.email)) {
+    return "El email no tiene un formato válido";
+  }
+  return null;
+}
+
+async function guardar() {
+  const cliente = {
+    email: txtEmail.value.trim(),
+    nombre: txtNombre.value.trim(),
+    apellido: txtApellido.value.trim(),
+    telefono: txtTelefeno.value.trim(),
+    direccion: txtDireccion.value.trim()
+  };
+
+  const errorValidacion = validar(cliente);
+  if (errorValidacion) {
+    mostrarAlerta("alertaModal", errorValidacion, "warning");
+    return;
+  }
+
+  try {
+    const respuesta = idEditando
+      ? await actualizarCliente(idEditando, cliente)
+      : await crearCliente(cliente);
+    modal.hide();
+    mostrarAlerta("alertas", respuesta.message, "success");
+    await cargarClientes();
+  } catch (error) {
+    mostrarAlerta("alertaModal", error.message, "danger");
+  }
+}
+
+function editar(id) {
+  const c = clientes.find((x) => String(x.idCliente) === String(id));
+  if (!c) return;
+  limpiarFormulario();
+  idEditando = c.idCliente;
+  txtEmail.value = c.email;
+  txtNombre.value = c.nombre;
+  txtApellido.value = c.apellido;
+  txtTelefeno.value = c.telefono;
+  txtDireccion.value = c.direccion === "SIN ESPECIFICAR" ? "" : c.direccion;
+  exampleModalLabel.textContent = "Editar cliente";
+  btnAgregarCliente.textContent = "Guardar cambios";
+  modal.show();
+}
+
+async function eliminar(id) {
+  if (!confirm("¿Eliminar este cliente?")) return;
+  try {
+    const respuesta = await eliminarCliente(id);
+    mostrarAlerta("alertas", respuesta.message, "success");
+    await cargarClientes();
+  } catch (error) {
+    mostrarAlerta("alertas", error.message, "danger");
+  }
+}
+
+btnNuevo.addEventListener("click", limpiarFormulario);
+btnAgregarCliente.addEventListener("click", guardar);
+
+tbIndex.addEventListener("click", (e) => {
+  const boton = e.target.closest("button");
+  if (!boton) return;
+  if (boton.classList.contains("btn-editar")) editar(boton.dataset.id);
+  if (boton.classList.contains("btn-eliminar")) eliminar(boton.dataset.id);
 });
-
-btnCancelar.addEventListener("click", limpiarFormulario);
-
-renderTabla.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-    if(!id) return;
-
-    if(id.target.classList.contains("btnEditar")){
-        const email = await obtenerClientes();
-        const reservar = reservar.find((r) => String (r.id) === String(rd));
-
-        if(id.target.classList. contains("btnEditar")){
-            idInput.value = reservar.id;
-            nombreInput.value = reservar.nombre;
-            apellidoInput.value = reservar.apellido;
-            telefonoInput.value = reservar.telefono;
-        }
-    }
-})
-
-if(e.target.classList.contains("btnEliminar")){
-    if(!confirm ("Eliminar esta reserva"))
-    try{
-        await eliminarCliente(id);
-        await cargarClientes();
-    } catch (error){
-        console.error(error);
-        alert("No se puede eliminar la reserva");
-    }
-};
-
-cargarClientes();
-
-async function guardarCambios(email, nombre, apellido, telefono) {
-    const postActualzado = await actualizarCliente(email, nombre, apellido, telefono);
-    console.log('Guardado: ', postActualzado);
-}
-
-async function borrar(id) {
-    await eliminarCliente(id);
-    console.log(`Post ${id} eliminado de la API.`);
-}
 
 cargarClientes();
