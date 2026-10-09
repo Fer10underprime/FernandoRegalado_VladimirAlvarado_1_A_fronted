@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes pagina</title>
+    <!-- Boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-success">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html">Menu principal</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="clientes.html">Clientes</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <br>
+      <!-- Fin navbar -->
+
+      <!-- Inicio tabla -->
+
+
+       <!-- Boton de añadir reservas -->
+       <button type="button" class="btn btn-primary text-center" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Gestion de reservas</button>
+       <br>
+      
+       <!-- Parte superior del modall -->
+        <!-- id -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+                 <!-- id -->
+               <h1 class="modal-title fs-5" id="exampleModalLabel">Agrega clientes</h1>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form>
+                 <!-- Campos del modal  -->
+ 
+                  <!-- Campo: Nombre completo -->
+                <div class="mb-3">
+                    <!-- id: txtCompleto -->
+                  <label for="txtCompleto" class="col-form-label">Nombre completo del cliente:</label>
+                  <select name="txtCompleto" class="form-select"></select>
+                </div>
+
+                <!-- Campo: Vehiculo -->
+                <div class="mb-3">
+                    <!-- id: txtVehiculo -->
+                  <label for="txtVehiculo" class="col-form-label">Vehiulo seleccionado:</label>
+                  <select name="txtVehiculo" class="form-select"></select>
+                </div>
+
+                <!-- Campo: fecha de reserva -->
+                <div class="mb-3">
+                    <!-- id: txtFecha -->
+                  <label for="txtFecha" class="col-form-label">Fecha:</label>
+                  <input type="date" class="form-control" id="txtFecha" placeholder="Ingrese su fecha: " required>
+                </div>
+
+                <!-- Campo: Cantidad de pasajeros -->
+                <div class="mb-3">
+                    <!-- id: txtPasajeros -->
+                  <label for="txtPasajeros" class="col-form-label">Pasajeros:</label>
+                  <input type="number" class="form-control" id="txtPasajeros" placeholder="Ingrese la cantidad de pasajeros: " required>
+                </div>
+
+                <!-- Campo: Cantidad de dias -->
+                <div class="mb-3">
+                    <!-- id: txtDias -->
+                  <label for="txtDias" class="col-form-label">Cantidad de dias:</label>
+                  <input type="number" class="form-control" id="txtDias" placeholder="Ingrese la cantidad de dias: " required>
+                </div>
+
+
+                <!-- Campo: Total a pagar -->
+                <div class="mb-3">
+                    <!-- id: txtPagar -->
+                  <label for="txtPagar" class="col-form-label">Total a pagar:</label>
+                  <input type="number" class="form-control" id="txtPagar" placeholder="Ingrese la de pagar: " required>
+                </div>
+
+                <!-- Campo: Estado actual -->
+                <div class="mb-3">
+                    <!-- id: txtestadoActual -->
+                  <label for="txtestadoActual" class="col-form-label">Estado actual:</label>
+                  <select name="txtestadoActual" class="form-select"></select>
+                </div>
+
+
+
+
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+               <!-- id -->
+               <button id="btnAgregarReservas" type="button" class="btn btn-primary">Agregar reservas</button>
+             </div>
+           </div>
+         </div>
+       </div>
+ 
+       <!-- Tabla de html -->
+        <main class=".col-md-4">
+       <table class="table">
+         <thead class="text-center">
+           <tr>
+             <th scope="col">#</th>
+             <!-- Select -->
+             <th scope="col">Nombre completo del cliente</th>
+             <!-- Select -->
+             <th scope="col">Vehiculo seleccionado</th>
+             <th scope="col">Fecha reserva</th>
+             <th scope="col">Cantidad de pasajeros</th>
+             <th scope="col">Cantidad de dìas</th>
+             <th scope="col">Total a pagar</th>
+             <th scope="col">Estado actual</th>
+           </tr>
+         </thead>
+         <tbody id="tbReservas">
+           <!-- Aqui se inserta los datos de js -->
+         </tbody>
+       </table>
+     </main>
+    
+
+   <!-- Boostrap js -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+   <script type="module" src="./js/controllers/clientesController.js"></script>
+</body>
+</html>
